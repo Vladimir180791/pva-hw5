@@ -10,19 +10,31 @@ def distribute_books(users, books):
     
     book_index = 0
     for i in range(num_users):
-        # Определяем сколько книг получит текущий пользователь
         books_count = base_books_per_user + (1 if i < extra_books else 0)
         
-        # Добавляем книги пользователю
         users[i]["books"] = books[book_index:book_index + books_count]
         book_index += books_count
 
+def filter_user_data(user):
+    return {
+        "name": user.get("name"),
+        "gender": user.get("gender"),
+        "address": user.get("address"),
+        "age": user.get("age"),
+        "books": [
+            {
+                "title": book.get("title"),
+                "author": book.get("author"),
+                "pages": book.get("pages"),
+                "genre": book.get("genre")
+            }
+            for book in user.get("books", [])
+        ]
+    }
 def main():
-    # Чтение пользователей
     with open('users.json', 'r') as f:
         users = json.load(f)
     
-    # Чтение книг
     books = []
     with open('books.csv', 'r') as f:
         reader = csv.DictReader(f)
@@ -34,10 +46,8 @@ def main():
                 "genre": row["Genre"]
             })
     
-    # Распределение книг
     distribute_books(users, books)
     
-    # Запись результата
     with open('result.json', 'w') as f:
         json.dump(users, f, indent=4)
 
